@@ -6,6 +6,7 @@ import {
   Grid,
   Header,
   Message,
+  Loader,
 } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import * as actions from '../redux/auth/action/actionCreate';
@@ -15,9 +16,9 @@ import { Navigate } from 'react-router-dom';
 
 const Login = ({ login, isAuthenticated, isLoading, id, isStuff }) => {
   if (isAuthenticated && isStuff) {
-    return <Navigate to='/admin/' />;
+    return <Navigate to='/dashboard/' />;
   } else if (isAuthenticated) {
-    return <Navigate to='/home/' />;
+    return <Navigate to='/quizzes/' />;
   }
 
   const handleSubmit = (event) => {
@@ -68,7 +69,15 @@ const Login = ({ login, isAuthenticated, isLoading, id, isStuff }) => {
             secondary
             className='fluid'
             type='submit'>
-            Login
+            {isLoading ? (
+              <Loader
+                active
+                inline
+                size='tiny'
+              />
+            ) : (
+              'Login'
+            )}
           </Button>
           <Divider horizontal>Or</Divider>
           <Message

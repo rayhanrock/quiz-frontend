@@ -8,6 +8,7 @@ import {
   Grid,
   Header,
   Message,
+  Loader,
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { isEmpty } from '../utiles/isEmpty';
@@ -99,7 +100,15 @@ const Registration = ({ signUp, isAuthenticated, id, isStuff, isLoading }) => {
             secondary
             className='fluid'
             type='submit'>
-            Sign Up
+            {isLoading ? (
+              <Loader
+                active
+                inline='centered'
+                size='tiny'
+              />
+            ) : (
+              'Sign Up'
+            )}
           </Button>
           <Divider horizontal>Or</Divider>
           <Message

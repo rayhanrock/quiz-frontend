@@ -1,6 +1,6 @@
 import * as actionType from './actionTypes';
 import axios from 'axios';
-import { handleError } from '../utility';
+import { handleError } from '../../../utiles/handleError';
 
 export const authStart = () => {
   return {
@@ -17,10 +17,9 @@ export const authSuccess = (token, id, isStuff) => {
   };
 };
 
-export const authFailure = (error) => {
+export const authFailure = () => {
   return {
     type: actionType.AUTH_FAILURE,
-    error: error,
   };
 };
 
@@ -70,7 +69,7 @@ export const authCheckState = () => {
             dispatch(authSuccess(token, id, isStuff));
           })
           .catch((error) => {
-            dispatch(authFailure(error.response.data));
+            dispatch(authFailure());
             handleError(error);
           });
 
@@ -102,11 +101,8 @@ export const authLogin = (username, password) => {
         dispatch(checkAuthTimeOut(3600));
       })
       .catch((error) => {
-        console.log('authlogin', error);
-        dispatch(
-          authFailure(error.response.data ? error.response.data : error)
-        );
         handleError(error);
+        dispatch(authFailure());
       });
   };
 };
@@ -128,7 +124,7 @@ export const authSignUp = (username, email, password, confirm_password) => {
         dispatch(authLogin(username, password));
       })
       .catch((error) => {
-        dispatch(authFailure(error.response.data));
+        dispatch(authFailure());
         handleError(error);
       });
   };

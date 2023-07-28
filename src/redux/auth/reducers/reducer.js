@@ -1,12 +1,11 @@
 import * as actionTypes from '../action/actionTypes';
-import { updateObject } from '../utility';
+import { updateObject } from '../../../utiles/updateObject';
 
 const initState = {
   loading: false,
   token: null,
   id: null,
   isStuff: null,
-  error: null,
 };
 
 const authStart = (state, action) => {
@@ -27,7 +26,6 @@ const authSuccess = (state, action) => {
 const authFailure = (state, action) => {
   return updateObject(state, {
     loading: false,
-    error: action.error,
   });
 };
 
