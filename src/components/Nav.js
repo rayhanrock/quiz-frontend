@@ -15,6 +15,7 @@ class Nav extends Component {
     return (
       <div>
         <Menu
+          stackable
           pointing
           secondary>
           <Menu.Item
@@ -30,6 +31,20 @@ class Nav extends Component {
             onClick={this.handleItemClick}
             as={NavLink}
             to='/quizzes/'
+          />
+          <Menu.Item
+            name='Profile'
+            active={activeItem === 'Profile'}
+            onClick={this.handleItemClick}
+            as={NavLink}
+            to='/user/'
+          />
+          <Menu.Item
+            name='Leaderboard'
+            active={activeItem === 'Leaderboard'}
+            onClick={this.handleItemClick}
+            as={NavLink}
+            to='/leaderboard/'
           />
 
           <Menu.Menu position='right'>

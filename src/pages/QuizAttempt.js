@@ -17,8 +17,9 @@ import { useSelector } from 'react-redux';
 import { useRef } from 'react';
 import { toast } from 'react-toastify';
 import { handleError } from '../utiles/handleError';
+import withLoading from '../hoc/WithLoading';
 
-const QuizAttempt = () => {
+const QuizAttempt = ({ isLoading, startLoading, stopLoading }) => {
   const auth = useSelector((state) => state.auth);
 
   const { quizID } = useParams();
@@ -64,6 +65,7 @@ const QuizAttempt = () => {
   }, [secondsLeft, timeLimit]);
 
   const getData = React.useCallback(async () => {
+    startLoading();
     axios
       .get(
         `${process.env.REACT_APP_API_URL}/api/quizzes/${quizID}/questions/`,
@@ -74,9 +76,11 @@ const QuizAttempt = () => {
       .then((response) => {
         setQuestions(response.data.results);
         setTotalPages(Math.ceil(response.data.count / 10));
+        stopLoading();
       })
       .catch((error) => {
         handleError(error);
+        stopLoading();
       });
   }, [currentPage]);
 
@@ -175,132 +179,134 @@ const QuizAttempt = () => {
   };
 
   return (
-    <div>
-      {submitted ? (
-        <>
-          <Message
-            style={{ marginTop: '25px' }}
-            success
-            header='Result Summary : '
-            attached='top'
-          />
-          <Segment
-            stacked
-            attached
-            raised>
-            <Grid
-              textAlign='center'
-              columns={2}
-              relaxed='very'>
-              <Grid.Column>
-                <Statistic>
-                  <Statistic.Value>{timeTaken}</Statistic.Value>
-                  <Statistic.Label>Duration (seconds)</Statistic.Label>
-                </Statistic>
-              </Grid.Column>
-              <Grid.Column>
-                <p>
-                  <Statistic>
-                    <Statistic.Value>{score}</Statistic.Value>
-                    <Statistic.Label>Total points</Statistic.Label>
-                  </Statistic>
-                </p>
-              </Grid.Column>
-            </Grid>
-
-            <Divider vertical>AND</Divider>
-          </Segment>
-        </>
-      ) : (
-        <h2 style={{ marginTop: '20px', marginBottom: '15px' }}>
-          Time Left: {Math.floor(secondsLeft / 60)}:{secondsLeft % 60} seconds
-        </h2>
-      )}
-
-      {questions.map((question) => (
-        <Card
-          key={question.id}
-          fluid>
-          <Card.Content>
-            <Label
-              style={{ float: 'right' }}
-              circular
-              color='green'
-              key={question.id}>
-              Points : {question.points}
-            </Label>
-            <Card.Header>{question.text}</Card.Header>
-
-            <Card.Description>
-              {question.answers.map((answer) => (
-                <div key={answer.id}>
-                  <div className='ui checkbox'>
-                    <input
-                      disabled={submitted}
-                      id={`answer_${answer.id}`}
-                      type='checkbox'
-                      name={`question_${question.id}`}
-                      value={answer.id}
-                      checked={answers.some(
-                        (a) =>
-                          a.question_id === question.id &&
-                          a.selected_answer === answer.id
-                      )}
-                      onChange={() =>
-                        handleAnswerChange(question.id, answer.id)
-                      }
-                    />
-                    <label
-                      htmlFor={`answer_${answer.id}`}
-                      style={{
-                        color: getAnswerLabelColor(question.id, answer),
-                        cursor: 'pointer',
-                        opacity: 1,
-                      }}>
-                      {answer.text}
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </Card.Description>
-          </Card.Content>
-        </Card>
-      ))}
-
-      <Grid
-        centered
-        style={{ marginTop: '10px', marginBottom: '15px' }}>
-        <Grid.Row>
-          {totalPages > 0 && (
-            <Pagination
-              activePage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              ellipsisItem={null}
-              boundaryRange={1}
-              siblingRange={1}
+    !isLoading && (
+      <div>
+        {submitted ? (
+          <>
+            <Message
+              style={{ marginTop: '25px' }}
+              success
+              header='Result Summary : '
+              attached='top'
             />
-          )}
-        </Grid.Row>
-      </Grid>
-      {!submitted && (
-        <Button
-          onClick={showConfirmSubmit}
-          fluid
-          secondary>
-          Submit
-        </Button>
-      )}
-      <Confirm
-        className='secondary'
-        open={confirmSubmit}
-        cancelButton='Never mind'
-        confirmButton="Let's do it"
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-      />
-    </div>
+            <Segment
+              stacked
+              attached
+              raised>
+              <Grid
+                textAlign='center'
+                columns={2}
+                relaxed='very'>
+                <Grid.Column>
+                  <Statistic>
+                    <Statistic.Value>{timeTaken}</Statistic.Value>
+                    <Statistic.Label>Duration (seconds)</Statistic.Label>
+                  </Statistic>
+                </Grid.Column>
+                <Grid.Column>
+                  <p>
+                    <Statistic>
+                      <Statistic.Value>{score}</Statistic.Value>
+                      <Statistic.Label>Total points</Statistic.Label>
+                    </Statistic>
+                  </p>
+                </Grid.Column>
+              </Grid>
+
+              <Divider vertical>AND</Divider>
+            </Segment>
+          </>
+        ) : (
+          <h2 style={{ marginTop: '20px', marginBottom: '15px' }}>
+            Time Left: {Math.floor(secondsLeft / 60)}:{secondsLeft % 60} seconds
+          </h2>
+        )}
+
+        {questions.map((question) => (
+          <Card
+            key={question.id}
+            fluid>
+            <Card.Content>
+              <Label
+                style={{ float: 'right' }}
+                circular
+                color='green'
+                key={question.id}>
+                Points : {question.points}
+              </Label>
+              <Card.Header>{question.text}</Card.Header>
+
+              <Card.Description>
+                {question.answers.map((answer) => (
+                  <div key={answer.id}>
+                    <div className='ui checkbox'>
+                      <input
+                        disabled={submitted}
+                        id={`answer_${answer.id}`}
+                        type='checkbox'
+                        name={`question_${question.id}`}
+                        value={answer.id}
+                        checked={answers.some(
+                          (a) =>
+                            a.question_id === question.id &&
+                            a.selected_answer === answer.id
+                        )}
+                        onChange={() =>
+                          handleAnswerChange(question.id, answer.id)
+                        }
+                      />
+                      <label
+                        htmlFor={`answer_${answer.id}`}
+                        style={{
+                          color: getAnswerLabelColor(question.id, answer),
+                          cursor: 'pointer',
+                          opacity: 1,
+                        }}>
+                        {answer.text}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </Card.Description>
+            </Card.Content>
+          </Card>
+        ))}
+
+        <Grid
+          centered
+          style={{ marginTop: '10px', marginBottom: '15px' }}>
+          <Grid.Row>
+            {totalPages > 0 && (
+              <Pagination
+                activePage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                ellipsisItem={null}
+                boundaryRange={1}
+                siblingRange={1}
+              />
+            )}
+          </Grid.Row>
+        </Grid>
+        {!submitted && (
+          <Button
+            onClick={showConfirmSubmit}
+            fluid
+            secondary>
+            Submit
+          </Button>
+        )}
+        <Confirm
+          className='secondary'
+          open={confirmSubmit}
+          cancelButton='Never mind'
+          confirmButton="Let's do it"
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+        />
+      </div>
+    )
   );
 };
 
-export default QuizAttempt;
+export default withLoading(QuizAttempt);

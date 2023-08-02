@@ -8,6 +8,10 @@ import { Loader } from 'semantic-ui-react';
 import { RequireAuth, StuffRoute } from './PrivateRoute';
 import QuizDetail from '../pages/QuizDetails';
 import QuizAttempt from '../pages/QuizAttempt';
+import SideMenuLayout from '../layout/SideMenuLayout';
+import UserStatistics from '../pages/UserStatistics';
+import UserProfile from '../pages/UserProfile';
+import Leaderboard from '../pages/Leaderboard';
 
 const loading = () => (
   <Loader
@@ -38,6 +42,34 @@ const AppContent = () => {
             </RequireAuth>
           }
         />
+        <Route
+          path='/user/'
+          exact
+          element={
+            <RequireAuth>
+              <SideMenuLayout />
+            </RequireAuth>
+          }>
+          <Route
+            path='/user/'
+            element={<UserProfile />}
+          />
+          <Route
+            path='/user/statistics/'
+            element={<UserStatistics />}
+          />
+        </Route>
+
+        <Route
+          path='/leaderboard/'
+          exact
+          element={
+            <RequireAuth>
+              <Leaderboard />
+            </RequireAuth>
+          }
+        />
+
         <Route
           path='/quizzes/:quizID/'
           exact
