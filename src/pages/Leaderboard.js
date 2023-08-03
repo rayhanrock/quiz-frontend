@@ -17,10 +17,14 @@ import { useCallback } from 'react';
 
 const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
   const [leaderboard, setLeaderboard] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState();
+  const [totalPages, setTotalPages] = useState();
+  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const getData = useCallback(async () => {
+  useEffect(() => {
     startLoading();
     const config = {
       headers: {
@@ -28,10 +32,8 @@ const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
       },
       params: {
         page: currentPage,
-        participants: '',
-        category: '',
-        quiz_id: '',
-        tag: '',
+        categories: selectedCategories.join(','),
+        tags: selectedTags.join(','),
         participants: 10,
       },
     };
@@ -48,27 +50,56 @@ const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
         handleError(error);
         stopLoading();
       });
-  }, [currentPage]);
+  }, [currentPage, selectedTags, selectedCategories]);
 
   useEffect(() => {
-    getData();
-  }, [getData]);
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
 
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/quizzes/categories/`, config)
+      .then((response) => {
+        const receivedResponse = response.data;
+        const formattedCategories = receivedResponse.map((category) => ({
+          text: category.name,
+          value: category.name,
+        }));
+        setCategories(formattedCategories);
+      })
+      .catch((error) => {
+        handleError(error);
+      });
+
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/quizzes/tags/`, config)
+      .then((response) => {
+        const receivedResponse = response.data;
+        const formattedTags = receivedResponse.map((tag) => ({
+          text: tag.name,
+          value: tag.name,
+        }));
+        setTags(formattedTags);
+      })
+      .catch((error) => {
+        handleError(error);
+      });
+  }, []);
   const handlePageChange = (event, { activePage }) => {
     setCurrentPage(activePage);
   };
 
-  const options = [
-    { text: 'Alabama', value: 1 },
-    { text: 'Alaska', value: 2 },
-    { text: 'Arizona', value: 3 },
-    { text: 'Arkansas', value: 4 },
-  ];
+  const handleCategoryChange = (e, { value }) => {
+    setSelectedCategories(value);
+  };
+  const handleTagChange = (e, { value }) => {
+    setSelectedTags(value);
+  };
+
   return (
-    !isLoading &&
-    (leaderboard.count === 0 ? (
-      <Segment textAlign='center'>None attempted any quiz yet.</Segment>
-    ) : (
+    !isLoading && (
       <>
         <Grid
           stackable
@@ -78,18 +109,20 @@ const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
               <Header as='h2'>Leaderboard</Header>
             </Grid.Column>
             <Grid.Column textAlign='right'>
-              {/* <Dropdown
+              <Dropdown
                 labeled
                 icon='tags'
                 style={{ backgroundColor: 'white' }}
                 className='icon'
                 button
                 floating
-                options={options}
+                options={tags}
                 multiple
                 selection
                 search
                 text='Tags'
+                onChange={handleTagChange}
+                value={selectedTags}
               />
               <Dropdown
                 labeled
@@ -98,50 +131,57 @@ const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
                 className='icon'
                 button
                 floating
-                options={options}
+                options={categories}
                 multiple
                 selection
                 search
                 text='Category'
-              /> */}
+                onChange={handleCategoryChange}
+                value={selectedCategories}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>
 
-        <Table
-          celled
-          striped
-          stackable
-          selectable
-          color='grey'>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Quiz</Table.HeaderCell>
-              <Table.HeaderCell>Participant name</Table.HeaderCell>
-              <Table.HeaderCell>Score</Table.HeaderCell>
-              <Table.HeaderCell>Attempt date</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {leaderboard.results.map((item, index) => (
-              <Table.Row key={index}>
-                <Table.Cell>
-                  <NavLink
-                    state={{ color: 'black' }}
-                    to={`/quizzes/${item.quiz_id}`}>
-                    {item.quiz}
-                  </NavLink>
-                </Table.Cell>
-                <Table.Cell>{item.user}</Table.Cell>
-                <Table.Cell>{item.score}</Table.Cell>
-                <Table.Cell>
-                  {new Date(item.start_time).toLocaleDateString()}
-                </Table.Cell>
+        {leaderboard.count === 0 ? (
+          <Segment textAlign='center'>None attempted any quiz yet.</Segment>
+        ) : (
+          <Table
+            celled
+            striped
+            stackable
+            selectable
+            color='grey'>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Quiz</Table.HeaderCell>
+                <Table.HeaderCell>Participant name</Table.HeaderCell>
+                <Table.HeaderCell>Score</Table.HeaderCell>
+                <Table.HeaderCell>Attempt date</Table.HeaderCell>
               </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+            </Table.Header>
+
+            <Table.Body>
+              {leaderboard.results?.map((item, index) => (
+                <Table.Row key={index}>
+                  <Table.Cell>
+                    <NavLink
+                      state={{ color: 'black' }}
+                      to={`/quizzes/${item.quiz_id}`}>
+                      {item.quiz}
+                    </NavLink>
+                  </Table.Cell>
+                  <Table.Cell>{item.user}</Table.Cell>
+                  <Table.Cell>{item.score}</Table.Cell>
+                  <Table.Cell>
+                    {new Date(item.start_time).toLocaleDateString()}
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        )}
+
         <Grid
           centered
           style={{ marginTop: '10px', marginBottom: '15px' }}>
@@ -159,7 +199,7 @@ const Leaderboard = ({ isLoading, startLoading, stopLoading }) => {
           </Grid.Row>
         </Grid>
       </>
-    ))
+    )
   );
 };
 
