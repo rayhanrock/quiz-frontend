@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import * as actions from './redux/auth/action/actionCreate';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { RequireAuth } from './components/PrivateRoute';
 
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'));
 const Login = React.lazy(() => import('./pages/Login'));
@@ -43,7 +44,11 @@ class App extends Component {
             <Route
               path='*'
               name='Home'
-              element={<DefaultLayout />}
+              element={
+                <RequireAuth>
+                  <DefaultLayout />
+                </RequireAuth>
+              }
             />
           </Routes>
 

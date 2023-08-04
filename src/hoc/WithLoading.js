@@ -20,6 +20,12 @@ const withLoading = (WrappedComponent) => {
 
       return (
         <>
+          <WrappedComponent
+            {...this.props}
+            isLoading={isLoading}
+            startLoading={this.startLoading}
+            stopLoading={this.stopLoading}
+          />
           {isLoading && (
             <Segment>
               <Dimmer
@@ -37,12 +43,6 @@ const withLoading = (WrappedComponent) => {
               </Placeholder>
             </Segment>
           )}
-          <WrappedComponent
-            {...this.props}
-            isLoading={isLoading}
-            startLoading={this.startLoading}
-            stopLoading={this.stopLoading}
-          />
         </>
       );
     }

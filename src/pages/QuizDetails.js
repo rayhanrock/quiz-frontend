@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import withLoading from '../hoc/WithLoading';
+import { handleError } from '../utiles/handleError';
 
 const QuizDetail = ({ isLoading, startLoading, stopLoading }) => {
   const auth = useSelector((state) => state.auth);
@@ -55,14 +56,13 @@ const QuizDetail = ({ isLoading, startLoading, stopLoading }) => {
         config
       )
       .then((response) => {
-        console.log(response);
         toast.success(response.data.message);
         navigate(`/quizzes/${quiz.id}/attempt/`, {
           state: { timeLimit: timeLimit },
         });
       })
       .catch((error) => {
-        console.log(error);
+        handleError(error);
       });
   };
 

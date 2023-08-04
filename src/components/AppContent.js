@@ -5,13 +5,14 @@ import Dashboard from '../pages/Dashboard';
 import { Routes } from 'react-router-dom';
 import { Suspense } from 'react';
 import { Loader } from 'semantic-ui-react';
-import { RequireAuth, StuffRoute } from './PrivateRoute';
+import { StuffRoute } from './PrivateRoute';
 import QuizDetail from '../pages/QuizDetails';
 import QuizAttempt from '../pages/QuizAttempt';
 import SideMenuLayout from '../layout/SideMenuLayout';
 import UserStatistics from '../pages/UserStatistics';
 import UserProfile from '../pages/UserProfile';
 import Leaderboard from '../pages/Leaderboard';
+import CreateQuiz from '../pages/CreateQuiz';
 
 const loading = () => (
   <Loader
@@ -31,25 +32,22 @@ const AppContent = () => {
             <StuffRoute>
               <Dashboard />
             </StuffRoute>
-          }
-        />
+          }>
+          <Route
+            path='/dashboard/'
+            element={<CreateQuiz />}
+          />
+        </Route>
+
         <Route
           path='/quizzes/'
           exact
-          element={
-            <RequireAuth>
-              <Quizzes />
-            </RequireAuth>
-          }
+          element={<Quizzes />}
         />
         <Route
           path='/user/'
           exact
-          element={
-            <RequireAuth>
-              <SideMenuLayout />
-            </RequireAuth>
-          }>
+          element={<SideMenuLayout />}>
           <Route
             path='/user/'
             element={<UserProfile />}
@@ -63,30 +61,18 @@ const AppContent = () => {
         <Route
           path='/leaderboard/'
           exact
-          element={
-            <RequireAuth>
-              <Leaderboard />
-            </RequireAuth>
-          }
+          element={<Leaderboard />}
         />
 
         <Route
           path='/quizzes/:quizID/'
           exact
-          element={
-            <RequireAuth>
-              <QuizDetail />
-            </RequireAuth>
-          }
+          element={<QuizDetail />}
         />
         <Route
           path='/quizzes/:quizID/attempt/'
           exact
-          element={
-            <RequireAuth>
-              <QuizAttempt />
-            </RequireAuth>
-          }
+          element={<QuizAttempt />}
         />
       </Routes>
     </Suspense>

@@ -34,20 +34,17 @@ const UserStatistics = ({ isLoading, startLoading, stopLoading }) => {
         config
       )
       .then((response) => {
-        console.log(response.data);
         setUserStats(response.data);
         setTotalPages(Math.ceil(response.data.count / 10));
         stopLoading();
       })
       .catch((error) => {
-        console.log(error);
         handleError(error);
         stopLoading();
       });
   }, [currentPage]);
 
   useEffect(() => {
-    console.log(auth.token);
     getData();
   }, [getData]);
 

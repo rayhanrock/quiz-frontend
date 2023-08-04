@@ -39,7 +39,10 @@ const Login = ({ login, isAuthenticated, isLoading, id, isStuff }) => {
 
   return (
     <Grid centered>
-      <Grid.Column width={8}>
+      <Grid.Column
+        mobile={12}
+        tablet={10}
+        computer={8}>
         <Header
           style={{ marginTop: '15px', marginBottom: '30px' }}
           textAlign='center'

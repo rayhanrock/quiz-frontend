@@ -17,9 +17,9 @@ import { Navigate } from 'react-router-dom';
 
 const Registration = ({ signUp, isAuthenticated, id, isStuff, isLoading }) => {
   if (isAuthenticated && isStuff) {
-    return <Navigate to='/admin/' />;
+    return <Navigate to='/dashboard/' />;
   } else if (isAuthenticated) {
-    return <Navigate to='/home/' />;
+    return <Navigate to='/quizzes/' />;
   }
 
   const handleSubmit = (event) => {
@@ -50,7 +50,10 @@ const Registration = ({ signUp, isAuthenticated, id, isStuff, isLoading }) => {
 
   return (
     <Grid centered>
-      <Grid.Column width={8}>
+      <Grid.Column
+        mobile={12}
+        tablet={10}
+        computer={8}>
         <Header
           style={{ marginTop: '15px', marginBottom: '30px' }}
           textAlign='center'

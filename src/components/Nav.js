@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import * as actions from '../redux/auth/action/actionCreate';
 
 class Nav extends Component {
-  state = { activeItem: 'home' };
+  state = { activeItem: '' };
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
@@ -18,13 +18,16 @@ class Nav extends Component {
           stackable
           pointing
           secondary>
-          <Menu.Item
-            name='Dashboard'
-            active={activeItem === 'dashboard'}
-            onClick={this.handleItemClick}
-            as={NavLink}
-            to='/dashboard/'
-          />
+          {this.props.isStuff && (
+            <Menu.Item
+              name='Dashboard'
+              active={activeItem === 'dashboard'}
+              onClick={this.handleItemClick}
+              as={NavLink}
+              to='/dashboard/'
+            />
+          )}
+
           <Menu.Item
             name='Quizzes'
             active={activeItem === 'quizzes'}
@@ -59,11 +62,15 @@ class Nav extends Component {
     );
   }
 }
-
+const mapStateToProps = (state) => {
+  return {
+    isStuff: state.auth.isStuff,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
     logout: () => dispatch(actions.logout()),
   };
 };
 
-export default connect(null, mapDispatchToProps)(Nav);
+export default connect(mapStateToProps, mapDispatchToProps)(Nav);
